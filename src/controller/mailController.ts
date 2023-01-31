@@ -1,10 +1,14 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import createHttpError from 'http-errors';
 import nodemailer from 'nodemailer';
 import env from '../util/validateEnv';
 
-export async function sendMail(req:Request,res:Response) {
+export async function sendMail(req:Request,res:Response, next:NextFunction) {
 
-    const { userName, email, OTP } = req.body
+    const { userName, email } = req.body
+    const OTP = res.app.locals.OTP;
+    
+    if(!email || !OTP) return next(createHttpError(501, 'Invalid input'));
     // create reusable transporter object using the default SMTP transport
     const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
@@ -21,9 +25,9 @@ export async function sendMail(req:Request,res:Response) {
       const message = {
         from: "foundrofficial@gmail.com",
         to: email, 
-        subject: "OTP for Email verification", // Subject line
+        subject: "Email verification", // Subject line
         html: "<h2> Hello "+ userName +"</h2>"+
-        "<h3>OTP for email verification is </h3>" +
+        "<h3>OTP for your email verification is </h3>" +
         "<h2 style='font-weight:bold;'>" + OTP +"</h2>"// html body
       }
   

@@ -20,13 +20,30 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
-export const userVerify = async (req: Request, res: Response, next: NextFunction) => {
+export const userExist = async (req: Request, res: Response, next: NextFunction) => {
     const { email } = req.query;
     const userExist = await userModel.findOne({ email })
     if (userExist) {
         return next(createHttpError(422,'email already exist'))
     } else {
         next()
+    }
+}
+
+export const verifyUser :RequestHandler = async (req,res,next)=>{
+    try {
+        const {email} = req.body;
+        console.log(email);
+        
+        const userExist = await userModel.findOne({email});
+        console.log(userExist);
+        if(userExist){
+            next()
+        }else{
+            return next(createHttpError(404,'User Not found'))
+        }
+    } catch (error) {
+        return next(InternalServerError)
     }
 }
 

@@ -4,7 +4,7 @@ import database from "./config/connection";
 import express  from "express";
 import createHttpError from "http-errors";
 import cors from 'cors'
-import userRouter from "./api/user"
+import userRouter from "./routes/user"
 import { errorHandler } from "./middleware/errorHandler";
 import morgan from "morgan"
 

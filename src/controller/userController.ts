@@ -66,9 +66,10 @@ export const userDetails: RequestHandler = async (req,res,next)=>{
         const user = await userModel.findById(req.query.userId);
         if(!user) return next(createHttpError(404, 'Could not find the user!'));
 
+        
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { password,...userDetails } = Object.assign({},user.toJSON()); // details except password 
-        res.status(200).send(userDetails);
+        const { password,...rest } = Object.assign({},user.toJSON()); // details except password 
+        res.status(200).json(rest);
         
     } catch (error) {
         return next(InternalServerError);
@@ -92,7 +93,7 @@ export const updateUser:RequestHandler = async (req,res,next) => {
     }
 }
 
-// GENERATE NEW OTP
+// GENERATE OTP
 export const generateOtp:RequestHandler = async (req,res,next)=>{
     try {
         req.app.locals.OTP = otpGenerator.generate(6, { lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars:false });
@@ -112,4 +113,20 @@ export const verifyOtp:RequestHandler = async (req,res,next) => {
         return res.status(201).send({msg:'Verified Successfully.'})
     }
     return next(createHttpError(501, 'invalid OTP'))
+}
+
+// CHANGE PASSWORD
+export const changePassword:RequestHandler = async(req,res,next) =>{
+    try {
+        const {newPassword, email} = req.body;
+        const password = await bcrypt.hash(newPassword, 10)
+
+        await userModel.findOneAndUpdate({email},{$set:{password:password}}).then((result)=>{
+            if(!result) return res.sendStatus(404) 
+            res.sendStatus(202)
+        })
+
+    } catch (error) {
+        return next(InternalServerError)
+    }
 }
