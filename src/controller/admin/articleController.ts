@@ -1,9 +1,20 @@
 import { RequestHandler } from "express";
-// import createHttpError, {InternalServerError} from "http-errors";
+import createHttpError, { InternalServerError } from "http-errors";
 import articleModel from "../../models/articleModel";
 
-export const publishAricle:RequestHandler = async(req,res) =>{
+// Get all the articles
+export const getArticles: RequestHandler = async (req, res, next) => {
+    try {
+        const articles = await articleModel.find();
+        if (!articles) return next(createHttpError(501, 'Could not retrieve data.'))
+        res.status(200).send(articles)
+    } catch (error) {
+        return next(InternalServerError)
+    }
+}
 
+// Publish a new article
+export const publishAricle: RequestHandler = async (req, res) => {
     console.log(req.body);
     const newArticle = new articleModel({
         title: req.body.title,
@@ -12,10 +23,9 @@ export const publishAricle:RequestHandler = async(req,res) =>{
     })
 
     newArticle.save()
-    .then((article)=>{
-        console.log(article);
-        res.sendStatus(201)
-    })
-    .catch((err)=> console.log(err))
-
+        .then((article) => {
+            console.log(article);
+            res.sendStatus(201)
+        })
+        .catch((err) => console.log(err))
 }

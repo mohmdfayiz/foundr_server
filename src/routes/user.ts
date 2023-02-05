@@ -1,14 +1,28 @@
 import { Router } from "express"
-import * as usercontroller from "../controller/userController"
-import { auth, userExist, verifyUser, localVariables } from "../middleware/authmiddleware"
+import * as usercontroller from "../controller/user/userController"
+import { auth, localVariables } from "../middleware/authmiddleware"
 import { sendMail } from "../controller/mailController"
 
 const router = Router()
 
+
+
+// GET METHODS
+
+router
+    .route('/verifyUser')
+    .get(usercontroller.userExist);
+
 router
     .route('/generateOtp')
-    .get(userExist,localVariables,usercontroller.generateOtp)
+    .get(localVariables,usercontroller.generateOtp);
 
+router
+    .route('/authenticate')
+    .get(usercontroller.authenticate, (req,res) =>res.end());
+
+
+// POST METHODS
 router
     .route('/verifyOtp')
     .post(usercontroller.verifyOtp)
@@ -23,11 +37,7 @@ router
 
 router
     .route("/signin")
-    .post(usercontroller.signin)
-
-router
-    .route('/forgotPassword')
-    .post(verifyUser,localVariables,usercontroller.generateOtp)    
+    .post(usercontroller.signin)   
 
 router
     .route('/changePassword')
@@ -35,10 +45,11 @@ router
 
 router
     .route('/getUser')
-    .get(usercontroller.userDetails)    
+    .get(auth,usercontroller.userDetails)    
 
 router
     .route('/updateUser')
     .post(auth, usercontroller.updateUser)
+    
 
 export default router;    

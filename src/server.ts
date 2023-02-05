@@ -8,13 +8,14 @@ import userRouter from "./routes/user"
 import adminRoute from "./routes/admin"
 import { errorHandler } from "./middleware/errorHandler";
 import morgan from "morgan"
-import bodyParser from "body-parser";
+
 
 const app = express();
 app.use(cors());
 
-app.use(bodyParser.urlencoded({ extended:true }))
-app.use(express.json());
+// fixing "413 Request Entity Too Large" errors
+app.use(express.json({limit: "5mb"}))
+app.use(express.urlencoded({limit: "5mb", extended: true, parameterLimit: 50000}))
 app.use(morgan('dev'));
 
 // api routes
@@ -29,7 +30,7 @@ const port = env.PORT;
 database(env.MONGO_CONNECTION_STRING);
 try{
     app.listen(port,()=>{
-        console.log(`Server running on http://localhost:${port}/api/user`); 
+        console.log(`Server running on http://localhost:${port}`);
     })
 }catch(err){
     console.log(err);

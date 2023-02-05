@@ -5,10 +5,12 @@ import env from '../util/validateEnv';
 
 export async function sendMail(req:Request,res:Response, next:NextFunction) {
 
-    const { userName, email } = req.body
-    const OTP = res.app.locals.OTP;
+    const email = req.body.email;
+    const userName = req.body?.userName || 'there..';
+    const OTP = req.body?.OTP;
     
     if(!email || !OTP) return next(createHttpError(501, 'Invalid input'));
+
     // create reusable transporter object using the default SMTP transport
     const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
