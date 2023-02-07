@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import env from "../../util/validateEnv";
 import otpGenerator from 'otp-generator'
 
+
 /* middleware for  user authentication */
 export const authenticate: RequestHandler = async (req, res, next) => {
     try {
