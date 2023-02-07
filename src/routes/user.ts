@@ -1,14 +1,12 @@
 import { Router } from "express"
 import * as usercontroller from "../controller/user/userController"
 import { auth, localVariables } from "../middleware/authmiddleware"
-import { sendMail } from "../controller/mailController"
+import { sendMail } from "../controller/user/mailController"
 
 const router = Router()
 
 
-
 // GET METHODS
-
 router
     .route('/verifyUser')
     .get(usercontroller.userExist);

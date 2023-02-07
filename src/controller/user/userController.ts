@@ -6,7 +6,6 @@ import jwt from "jsonwebtoken";
 import env from "../../util/validateEnv";
 import otpGenerator from 'otp-generator'
 
-
 /* middleware for  user authentication */
 export const authenticate: RequestHandler = async (req, res, next) => {
     try {
@@ -38,6 +37,7 @@ export const userExist: RequestHandler = async (req, res, next) => {
 export const signup: RequestHandler = async (req, res, next) => {
     try {
         const { userName, email, password } = req.body;
+        
         const userExist = await userModel.findOne({ email });
         if (userExist) return next(createHttpError(422, 'Email already exist!'));
 
@@ -70,7 +70,7 @@ export const signup: RequestHandler = async (req, res, next) => {
     }
 }
 
-// USER LOGIN
+// USER SIGNIN
 export const signin: RequestHandler = async (req, res, next) => {
     const { email, password } = req.body;
     try {
@@ -146,14 +146,16 @@ export const generateOtp: RequestHandler = async (req, res, next) => {
 
 // VERIFY OTP
 export const verifyOtp: RequestHandler = async (req, res, next) => {
-    const code = (req.query.otp);
+    const { code } = req.query;
+    console.log(code);
+    
     if (!code) return next(createHttpError(501, 'invalid OTP'))
     if ((req.app.locals.OTP) === code) {
         req.app.locals.OTP = null; // reset the otp value
         req.app.locals.resetSession = true; //start session for reset password
         return res.status(201).send({ msg: 'Verified Successfully.' })
     }
-    return next(createHttpError(501, 'invalid OTP'))
+    return next(createHttpError(401, 'invalid OTP'))
 }
 
 // CHANGE PASSWORD
