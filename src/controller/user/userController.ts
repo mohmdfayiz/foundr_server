@@ -38,7 +38,7 @@ export const userExist: RequestHandler = async (req, res, next) => {
 export const signup: RequestHandler = async (req, res, next) => {
     try {
         const { userName, email, password } = req.body;
-        
+
         const userExist = await userModel.findOne({ email });
         if (userExist) return next(createHttpError(422, 'Email already exist!'));
 
@@ -53,14 +53,13 @@ export const signup: RequestHandler = async (req, res, next) => {
                     // create jwt token
                     const token = jwt.sign({
                         userId: newUser._id,
-                        email: newUser.email,
                         userName: newUser.userName
                     }, env.JWT_SECRET, { expiresIn: "24h" });
 
                     return res.status(201).send({
                         message: "Signup Successful...",
-                        userName: newUser.userName,
-                        token
+                        userId: newUser._id,
+                        token,
                     })
                 })
                 .catch((error) => { res.status(500).json(error) })
@@ -84,13 +83,12 @@ export const signin: RequestHandler = async (req, res, next) => {
         // create jwt token
         const token = jwt.sign({
             userId: user._id,
-            email: user.email,
             userName: user.userName
         }, env.JWT_SECRET, { expiresIn: "24h" });
 
         return res.status(200).send({
             message: "Login Successful...",
-            userName: user.userName,
+            userId: user._id,
             token
         })
 
@@ -104,9 +102,8 @@ export const userDetails: RequestHandler = async (req, res, next) => {
     try {
         const { userId } = res.locals.decodedToken;
         if (!userId) return next(createHttpError(401, 'Invalid userId'));
-        console.log(userId);
 
-        const user = await userModel.findById(req.query.userId);
+        const user = await userModel.findById(userId);
         if (!user) return next(createHttpError(404, 'Could not find the user!'));
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -119,21 +116,66 @@ export const userDetails: RequestHandler = async (req, res, next) => {
 }
 
 // UPDATE USER DETAILS
-export const updateUser: RequestHandler = async (req, res, next) => {
+export const updateUserDetails: RequestHandler = async (req, res, next) => {
     try {
+
         const { userId } = res.locals.decodedToken;
-        if (userId) {
-            const { userName, email } = req.body;
-            await userModel.updateOne({ _id: userId }, { $set: { userName, email } }).then(() => {
-                res.status(201).json('record updated successfully')
-            }).catch(() => next(createHttpError(501, 'Unable to update')))
-        } else {
-            return next(createHttpError(401, 'Unauthorized user'))
-        }
+        if (!userId) return next(createHttpError(401, 'Unauthorized user'))
+
+        const { about, gender, age, country, state, city } = req.body
+        await userModel.updateOne({ _id: userId }, { $set: { about, gender, age, location: { country, state, city } } })
+
     } catch (error) {
         return next(InternalServerError)
     }
 }
+
+// GET CONNCTIONS
+export const getConnections: RequestHandler = async (req, res, next) => {
+    try {
+        const {userId} = res.locals.decodedToken
+        if(!userId) return next(createHttpError(401, "unauthorized user"));
+        
+        const connectedUsers = await userModel.findById(userId).populate('connections').select({ connections: 1, _id: 0 })
+        res.status(200).json(connectedUsers)
+    } catch (error) {
+        return next(InternalServerError)
+    }
+}
+
+
+// ADD CONNECTION
+export const connection: RequestHandler = async (req, res, next) => {
+    try {
+
+        // const userId = res.locals.decodedToken
+        const user = req.query.user
+        const userId = req.query.userId
+
+        const newConnection = await userModel.findOneAndUpdate({ _id: userId }, { $push: { connections: user } })
+        res.status(201).json(newConnection)
+
+    } catch (error) {
+        return next(InternalServerError)
+    }
+}
+
+
+// export const updateUser: RequestHandler = async (req, res, next) => {
+//     try {
+//         const { userId } = res.locals.decodedToken;
+//         if (userId) {
+//             const { userName, email } = req.body;
+//             await userModel.updateOne({ _id: userId }, { $set: { userName, email } }).then(() => {
+//                 res.status(201).json('record updated successfully')
+//             }).catch(() => next(createHttpError(501, 'Unable to update')))
+//         } else {
+//             return next(createHttpError(401, 'Unauthorized user'))
+//         }
+//     } catch (error) {
+//         return next(InternalServerError)
+//     }
+// }
 
 // GENERATE OTP
 export const generateOtp: RequestHandler = async (req, res, next) => {
@@ -149,7 +191,7 @@ export const generateOtp: RequestHandler = async (req, res, next) => {
 export const verifyOtp: RequestHandler = async (req, res, next) => {
     const { code } = req.query;
     console.log(code);
-    
+
     if (!code) return next(createHttpError(501, 'invalid OTP'))
     if ((req.app.locals.OTP) === code) {
         req.app.locals.OTP = null; // reset the otp value

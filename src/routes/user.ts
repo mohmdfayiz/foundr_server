@@ -2,6 +2,7 @@ import { Router } from "express"
 import * as usercontroller from "../controller/user/userController"
 import { auth, localVariables } from "../middleware/authmiddleware"
 import { sendMail } from "../controller/user/mailController"
+import * as chatController from "../controller/user/chatController"
 
 const router = Router()
 
@@ -18,6 +19,14 @@ router
 router
     .route('/authenticate')
     .get(usercontroller.authenticate, (req,res) =>res.end());
+
+router
+    .route('/getConnections')
+    .get(auth,usercontroller.getConnections)    
+
+router
+    .route('/getMessages')
+    .get(auth,chatController.getMessage)    
 
 
 // POST METHODS
@@ -46,8 +55,15 @@ router
     .get(auth,usercontroller.userDetails)    
 
 router
-    .route('/updateUser')
-    .post(auth, usercontroller.updateUser)
-    
+    .route('/updateUserDetails')
+    .post(auth, usercontroller.updateUserDetails)    
+
+router
+    .route('/sendMessage')
+    .post(auth,chatController.sendMessage)    
+
+router
+    .route('/addConnection')
+    .post(usercontroller.connection)
 
 export default router;    
