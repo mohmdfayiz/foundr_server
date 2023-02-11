@@ -29,7 +29,7 @@ app.use(errorHandler);
 
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5173",
+        origin: env.FRONT_END_URL,
         credentials: true
     }
 })
@@ -42,13 +42,9 @@ io.on("connection", (socket) => {
     // const chatSocket = socket;
     socket.on("addUser", (id) => {
         onlineUsers.set(id, socket.id);
-        console.log(onlineUsers, '------------online users');
-        console.log(id, '----------addUser');
-        
     })
 
     socket.on("send-msg", (data) => {
-        console.log(data, '-----------send message data');
         const sendUserSocket = onlineUsers.get(data.to)
         if (sendUserSocket) {
             socket.to(sendUserSocket).emit("msg-receive", data.message)

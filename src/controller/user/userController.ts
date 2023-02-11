@@ -75,6 +75,8 @@ export const signin: RequestHandler = async (req, res, next) => {
     const { email, password } = req.body;
     try {
         const user = await userModel.findOne({ email })
+        console.log(user);
+        
         if (!user) return next(createHttpError(404, 'User not found!'));
 
         const isValidPassword = await bcrypt.compare(password, user.password);
@@ -93,6 +95,7 @@ export const signin: RequestHandler = async (req, res, next) => {
         })
 
     } catch (error) {
+        console.log(error);
         return next(InternalServerError)
     }
 }
@@ -125,7 +128,25 @@ export const updateUserDetails: RequestHandler = async (req, res, next) => {
         const { about, gender, age, country, state, city } = req.body
         await userModel.updateOne({ _id: userId }, { $set: { about, gender, age, location: { country, state, city } } })
 
+        res.status(201).send('updated successfully')
+
     } catch (error) {
+        return next(InternalServerError)
+    }
+}
+
+// MATCHING PROFILES
+export const matchingProfiles: RequestHandler = async (req, res, next) => {
+    try {
+        
+        const {userId} = res.locals.decodedToken;
+        if(!userId) return next(createHttpError(401, 'Unauthorized user'))
+        const profiles = await userModel.find({_id: { $ne: userId},'connections.user': { $ne:userId}})
+        
+        res.status(200).send(profiles)
+    } catch (error) {
+        console.log(error);
+        
         return next(InternalServerError)
     }
 }
@@ -142,40 +163,6 @@ export const getConnections: RequestHandler = async (req, res, next) => {
         return next(InternalServerError)
     }
 }
-
-
-// ADD CONNECTION
-export const connection: RequestHandler = async (req, res, next) => {
-    try {
-
-        // const userId = res.locals.decodedToken
-        const user = req.query.user
-        const userId = req.query.userId
-
-        const newConnection = await userModel.findOneAndUpdate({ _id: userId }, { $push: { connections: user } })
-        res.status(201).json(newConnection)
-
-    } catch (error) {
-        return next(InternalServerError)
-    }
-}
-
-
-// export const updateUser: RequestHandler = async (req, res, next) => {
-//     try {
-//         const { userId } = res.locals.decodedToken;
-//         if (userId) {
-//             const { userName, email } = req.body;
-//             await userModel.updateOne({ _id: userId }, { $set: { userName, email } }).then(() => {
-//                 res.status(201).json('record updated successfully')
-//             }).catch(() => next(createHttpError(501, 'Unable to update')))
-//         } else {
-//             return next(createHttpError(401, 'Unauthorized user'))
-//         }
-//     } catch (error) {
-//         return next(InternalServerError)
-//     }
-// }
 
 // GENERATE OTP
 export const generateOtp: RequestHandler = async (req, res, next) => {
