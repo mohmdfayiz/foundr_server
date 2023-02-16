@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken";
 import env from "../../util/validateEnv";
 import otpGenerator from 'otp-generator'
-
+import fileUploader from "./fileUploader";
 
 /* middleware for  user authentication */
 export const authenticate: RequestHandler = async (req, res, next) => {
@@ -75,8 +75,6 @@ export const signin: RequestHandler = async (req, res, next) => {
     const { email, password } = req.body;
     try {
         const user = await userModel.findOne({ email })
-        console.log(user);
-        
         if (!user) return next(createHttpError(404, 'User not found!'));
 
         const isValidPassword = await bcrypt.compare(password, user.password);
@@ -87,7 +85,6 @@ export const signin: RequestHandler = async (req, res, next) => {
             userId: user._id,
             userName: user.userName
         }, env.JWT_SECRET, { expiresIn: "24h" });
-
         return res.status(200).send({
             message: "Login Successful...",
             userId: user._id,
@@ -111,25 +108,68 @@ export const userDetails: RequestHandler = async (req, res, next) => {
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { password, ...rest } = Object.assign({}, user.toJSON()); // details except password 
-        res.status(200).json(rest);
+        res.status(200).json({ userDetails: rest });
 
     } catch (error) {
         return next(InternalServerError);
     }
 }
 
-// UPDATE USER DETAILS
-export const updateUserDetails: RequestHandler = async (req, res, next) => {
+// PROFILE PHOTO
+export const profilePhoto:RequestHandler = async (req,res,next) => {
     try {
+        const {userId} = res.locals.decodedToken;
+        if(!userId) return next(createHttpError(401, 'Unauthorized user'))
+        const profilePhoto = req.body.file;
+        
+        fileUploader(profilePhoto)
+        .then(async (profilePhoto)=>{
+            console.log(profilePhoto);
+            await userModel.updateOne({_id:userId},{$set:{profilePhoto}})
+            res.sendStatus(201)
+        })
+    } catch (error) {
+        console.log(error);
+        return next(InternalServerError)
+    }
+}
 
+// UPDATE USER PROFILE
+export const updateUserProfile: RequestHandler = async (req, res, next) => {
+    try {
         const { userId } = res.locals.decodedToken;
         if (!userId) return next(createHttpError(401, 'Unauthorized user'))
-
-        const { about, gender, age, country, state, city } = req.body
-        await userModel.updateOne({ _id: userId }, { $set: { about, gender, age, location: { country, state, city } } })
-
+        const { intro, gender, age, country, state, city } = req.body
+        await userModel.updateOne({ _id: userId }, { $set: { intro, gender, age, location: { country, state, city } } })
         res.status(201).send('updated successfully')
 
+    } catch (error) {
+        return next(InternalServerError)
+    }
+}
+
+// UPDATE ABOUT USER
+export const updateAbout:RequestHandler = async (req,res,next) => {
+    try {
+        const {userId} = res.locals.decodedToken;
+        if(!userId) return next(createHttpError(401, 'Unauthorized User'))
+        const {isTechnical, haveIdea, accomplishments, education, employment, responsibilities, interests} = req.body
+        
+        await userModel.updateOne({_id:userId}, {$set:{isTechnical,haveIdea,accomplishments,education,employment,responsibilities,interests}})
+        res.status(201).send({message: 'Updated successfully'})
+    } catch (error) {
+        return next(InternalServerError)
+    }
+}
+
+// UPDATE COFOUNDER PREFERENCE
+export const updateCofounderPreference:RequestHandler = async (req,res,next) =>{
+    try {
+        const {userId} = res.locals.decodedToken;
+        if(!userId) return next(createHttpError(401, 'Unauthorized user'))
+        const {activelySeeking, cofounderTechnical, cofounderHasIdea, locationPreference, cofounderResponsibilities} = req.body
+        await userModel.updateOne({_id:userId}, {$set:{activelySeeking, cofounderTechnical, cofounderHasIdea, locationPreference, cofounderResponsibilities}})
+        res.status(201).send({message:'cofounder preference updated successfully'})
     } catch (error) {
         return next(InternalServerError)
     }
@@ -138,15 +178,12 @@ export const updateUserDetails: RequestHandler = async (req, res, next) => {
 // MATCHING PROFILES
 export const matchingProfiles: RequestHandler = async (req, res, next) => {
     try {
-        
-        const {userId} = res.locals.decodedToken;
-        if(!userId) return next(createHttpError(401, 'Unauthorized user'))
-        const profiles = await userModel.find({_id: { $ne: userId},'connections.user': { $ne:userId}})
-        
+        const { userId } = res.locals.decodedToken;
+        if (!userId) return next(createHttpError(401, 'Unauthorized user'))
+        const profiles = await userModel.find({ _id: { $ne: userId }, 'connections.user': { $ne: userId } })
         res.status(200).send(profiles)
     } catch (error) {
         console.log(error);
-        
         return next(InternalServerError)
     }
 }
@@ -154,9 +191,9 @@ export const matchingProfiles: RequestHandler = async (req, res, next) => {
 // GET CONNCTIONS
 export const getConnections: RequestHandler = async (req, res, next) => {
     try {
-        const {userId} = res.locals.decodedToken
-        if(!userId) return next(createHttpError(401, "unauthorized user"));
-        
+        const { userId } = res.locals.decodedToken
+        if (!userId) return next(createHttpError(401, "unauthorized user"));
+
         const connectedUsers = await userModel.findById(userId).populate('connections').select({ connections: 1, _id: 0 })
         res.status(200).json(connectedUsers)
     } catch (error) {

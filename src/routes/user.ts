@@ -6,6 +6,7 @@ import * as chatController from "../controller/user/chatController"
 import * as requestController from "../controller/user/connectionRequestController"
 import * as articleController from "../controller/user/articleController"
 import * as eventController from "../controller/user/eventController"
+import * as matchingProfile from '../controller/user/matchingProfile'
 
 const router = Router()
 
@@ -29,7 +30,7 @@ router
 
 router
     .route('/matchingProfiles')
-    .get(auth,usercontroller.matchingProfiles)
+    .get(auth,matchingProfile.findMatchingProfiles)
 
 router
     .route('/getConnections')
@@ -71,8 +72,20 @@ router
     .post(usercontroller.changePassword)
 
 router
-    .route('/updateUserDetails')
-    .post(auth, usercontroller.updateUserDetails)
+    .route('/profilePhoto')
+    .post(auth,usercontroller.profilePhoto)
+
+router
+    .route('/updateUserProfile')
+    .post(auth, usercontroller.updateUserProfile)
+
+router
+    .route('/updateAbout')
+    .post(auth,usercontroller.updateAbout)
+
+router
+    .route('/updateCofounderPreference')
+    .post(auth,usercontroller.updateCofounderPreference)
 
 router
     .route('/sendMessage')

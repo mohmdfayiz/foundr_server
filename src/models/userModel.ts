@@ -1,38 +1,59 @@
 import { Document, model, Schema, Types } from "mongoose";
 
-export interface IUser extends Document{
-    userName:string;
-    email:string;
-    password:string;
-    status:string;
-    gender:string;
-    age:number;
-    about:string;
-    websiteUrl:string;
-    location:{country:string, state:string, city:string};
-    eduction:string;
-    employment:string;
-    cofounderPreferences:object;
-    connections:[Types.ObjectId];
+export interface IUser extends Document {
+    userName: string;
+    email: string;
+    password: string;
+    status: string;
+    gender: string;
+    age: number;
+    intro: string;
+    websiteUrl: string;
+    profilePhoto:string;
+    location: { country: string, state: string, city: string };
+    eduction: string;
+    employment: string;
+    isTechnical: boolean;
+    accomplishments: string;
+    haveIdea: string;
+    responsibilities:[string];
+    interests:[string];
+    activelySeeking:boolean;
+    cofounderTechnical:number;
+    cofounderHasIdea:number;
+    locationPreference:number;
+    cofounderResponsibilities:[string];
+    connections: [Types.ObjectId];
 }
 
 const userSchema = new Schema({
     userName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true},
+    password: { type: String, required: true },
     status: { type: String, default: "Active" },
-    age:{type:Number},
-    gender:String,
-    about:String,
-    websiteUrl:String,
-    location:{
-        country:String,
-        state:String,
-        city:String
+    age: { type: Number },
+    gender: String,
+    intro: String,
+    profilePhoto:String,
+    websiteUrl: String,
+    location: {
+        country: String,
+        state: String,
+        city: String
     },
-    education:String,
-    employment:String,
-    connections:[{type:Types.ObjectId, ref:'User'}]
+    isTechnical: { type: Boolean },
+    accomplishments: { type: String },
+    haveIdea: { type: String },
+    education: String,
+    employment: String,
+    responsibilities: [String],
+    interests: [String],
+    activelySeeking:{type:Boolean},
+    cofounderTechnical:{type:Number},
+    cofounderHasIdea:{type:Number},
+    locationPreference:{type:Number},
+    cofounderResponsibilities:[String],
+    connections: [{ type: Types.ObjectId, ref: 'User' }]
 },
     { timestamps: true }
 )

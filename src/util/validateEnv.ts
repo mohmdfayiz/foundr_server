@@ -7,4 +7,8 @@ export default cleanEnv(process.env,{
     JWT_SECRET: str(),
     MAIL_PASSWORD: str(),
     FRONT_END_URL: str(),
+    CLOUD_NAME:str(),
+    API_KEY:str(),
+    API_SECRET:str(),
+
 })

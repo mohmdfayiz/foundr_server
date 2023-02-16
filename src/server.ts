@@ -37,8 +37,6 @@ const io = new Server(server, {
 const onlineUsers = new Map();
 io.on("connection", (socket) => {
 
-    console.log('Client connected:', socket.id);
-
     // const chatSocket = socket;
     socket.on("addUser", (id) => {
         onlineUsers.set(id, socket.id);
