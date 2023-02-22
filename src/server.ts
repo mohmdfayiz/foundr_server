@@ -12,7 +12,7 @@ import morgan from "morgan"
 import { Server } from "socket.io";
 
 const app = express();
-const server = http.createServer(app)
+const server = http.createServer(app);
 app.use(cors());
 
 // fixing "413 Request Entity Too Large" errors
@@ -26,7 +26,6 @@ app.use('/api/admin', adminRoute);
 app.use(() => { throw createHttpError(404, 'Route not found') });
 app.use(errorHandler);
 
-
 const io = new Server(server, {
     cors: {
         origin: env.FRONT_END_URL,
@@ -37,15 +36,23 @@ const io = new Server(server, {
 const onlineUsers = new Map();
 io.on("connection", (socket) => {
 
-    // const chatSocket = socket;
-    socket.on("addUser", (id) => {
-        onlineUsers.set(id, socket.id);
+    // add user to onlineUsers if not already exist
+    socket.on("addUser", (id) => { 
+        !onlineUsers.get(id) && onlineUsers.set(id, socket.id)
     })
 
+    // send message to the client
     socket.on("send-msg", (data) => {
         const sendUserSocket = onlineUsers.get(data.to)
         if (sendUserSocket) {
             socket.to(sendUserSocket).emit("msg-receive", data.message)
+        }
+    })
+
+    socket.on('notification', (data) => {
+        const sendUserSocket = onlineUsers.get(data.receiver)
+        if (sendUserSocket) {
+            socket.to(sendUserSocket).emit("notification-receive", data)
         }
     })
 
@@ -55,7 +62,6 @@ io.on("connection", (socket) => {
     });
 
 })
-
 
 const port = env.PORT;
 database(env.MONGO_CONNECTION_STRING);

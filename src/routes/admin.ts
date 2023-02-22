@@ -15,7 +15,7 @@ router
 
 router
     .route('/publishArticle')
-    .post(articleController.publishAricle);
+    .post(articleController.publishArticle);
     
 router
     .route('/getEvents')

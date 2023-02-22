@@ -72,12 +72,16 @@ router
     .post(usercontroller.changePassword)
 
 router
+    .route('/joinEvent')
+    .post(auth,eventController.joinEvent)
+
+router
     .route('/profilePhoto')
     .post(auth,usercontroller.profilePhoto)
 
 router
     .route('/updateUserProfile')
-    .post(auth, usercontroller.updateUserProfile)
+    .post(auth,usercontroller.updateUserProfile)
 
 router
     .route('/updateAbout')

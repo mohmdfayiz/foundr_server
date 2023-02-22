@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken";
 import env from "../../util/validateEnv";
 import otpGenerator from 'otp-generator'
-import fileUploader from "./fileUploader";
+import fileUploader from "../../util/fileUploader";
 
 /* middleware for  user authentication */
 export const authenticate: RequestHandler = async (req, res, next) => {
@@ -53,12 +53,12 @@ export const signup: RequestHandler = async (req, res, next) => {
                     // create jwt token
                     const token = jwt.sign({
                         userId: newUser._id,
+                        email:newUser.email,
                         userName: newUser.userName
                     }, env.JWT_SECRET, { expiresIn: "24h" });
 
                     return res.status(201).send({
                         message: "Signup Successful...",
-                        userId: newUser._id,
                         token,
                     })
                 })
@@ -83,11 +83,11 @@ export const signin: RequestHandler = async (req, res, next) => {
         // create jwt token
         const token = jwt.sign({
             userId: user._id,
+            email:user.email,
             userName: user.userName
         }, env.JWT_SECRET, { expiresIn: "24h" });
         return res.status(200).send({
             message: "Login Successful...",
-            userId: user._id,
             token
         })
 
@@ -195,7 +195,9 @@ export const getConnections: RequestHandler = async (req, res, next) => {
         if (!userId) return next(createHttpError(401, "unauthorized user"));
 
         const connectedUsers = await userModel.findById(userId).populate('connections').select({ connections: 1, _id: 0 })
+       
         res.status(200).json(connectedUsers)
+
     } catch (error) {
         return next(InternalServerError)
     }

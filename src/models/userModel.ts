@@ -16,14 +16,14 @@ export interface IUser extends Document {
     isTechnical: boolean;
     accomplishments: string;
     haveIdea: string;
-    responsibilities:[string];
-    interests:[string];
+    responsibilities:string[];
+    interests:string[];
     activelySeeking:boolean;
     cofounderTechnical:number;
     cofounderHasIdea:number;
     locationPreference:number;
-    cofounderResponsibilities:[string];
-    connections: [Types.ObjectId];
+    cofounderResponsibilities:string[];
+    connections: Types.ObjectId[];
 }
 
 const userSchema = new Schema({

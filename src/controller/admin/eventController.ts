@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import eventModel from "../../models/eventModel";
 import createHttpError, {InternalServerError} from "http-errors";
+import fileUploader from "../../util/fileUploader";
 
 
 // Get all the events
@@ -18,16 +19,17 @@ export const getEvents:RequestHandler = async (req,res,next) =>{
 export const hostEvent:RequestHandler = async (req,res,next) => {
     
     try {
+        const mentorImage = await fileUploader(req.body.mentorImage)
         const newEvent = new eventModel({
             mentorName:req.body.mentorName,
             title:req.body.title,
             description:req.body.description,
             dateAndTime:req.body.dateAndTime,
             venue:req.body.venue,
-            mentorImage:req.body.montorImage
+            mentorImage
         })
         
-        newEvent.save()
+        await newEvent.save()
         .then((event)=>{
             console.log(event);
             res.sendStatus(201)

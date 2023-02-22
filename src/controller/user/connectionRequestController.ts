@@ -1,7 +1,29 @@
 import { RequestHandler } from "express";
 import createHttpError, { InternalServerError } from "http-errors";
 import connectionRequestModel from "../../models/connectionRequestModel";
+import notificationModel from "../../models/notificationModel";
 import userModel from "../../models/userModel";
+
+export const requestNotification:RequestHandler = async(req,res,next) => {
+    try {
+        const {userId} = res.locals.decodedToken
+        if(!userId) return next(createHttpError(401, 'Unauthorized user'))
+        const {receiver, title, message} = req.body
+
+        const newNotification = new notificationModel({
+            sender:userId,
+            receiver,
+            title,
+            message
+        })
+
+        await newNotification.save();
+        res.sendStatus(201)
+
+    } catch (error) {
+        return next(InternalServerError)
+    }
+};
 
 export const connectionRequest: RequestHandler = async (req, res, next) => {
     try {
@@ -9,8 +31,7 @@ export const connectionRequest: RequestHandler = async (req, res, next) => {
         const { userId } = res.locals.decodedToken
         if (!userId) return next(createHttpError(401, "Unauthorized user"));
         const { to } = req.query
-        console.log(to);
-
+    
         const newRequest = new connectionRequestModel({
             sender: userId,
             receiver: to,
@@ -42,8 +63,8 @@ export const updateConnectionRequst: RequestHandler = async (req, res, next) => 
 
         // If the request was accepted, add the sender and receiver to each other's connections
         if (accept) {
-            const sender = await userModel.findByIdAndUpdate(connectionRequest.sender, {$push:{connections:connectionRequest.receiver}});
-            const receiver = await userModel.findByIdAndUpdate(connectionRequest.receiver,{$push:{connections:connectionRequest.sender}});
+            await userModel.findByIdAndUpdate(connectionRequest.sender, {$push:{connections:connectionRequest.receiver}});
+            await userModel.findByIdAndUpdate(connectionRequest.receiver,{$push:{connections:connectionRequest.sender}});
             return res.status(201).json('Connection successful')
         }
 
