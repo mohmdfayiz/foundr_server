@@ -4,7 +4,8 @@
   "description": "server of foundr.",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --exec ts-node src/server.ts",
+    "start": "ts-node src/server.ts",
+    "dev": "nodemon --exec ts-node src/server.ts",
     "lint": "eslint . --ext .ts"
   },
   "author": "",
