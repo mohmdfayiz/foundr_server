@@ -13,12 +13,12 @@ export interface IUser extends Document {
     location: { country: string, state: string, city: string };
     eduction: string;
     employment: string;
-    isTechnical: boolean;
+    isTechnical: number;
     accomplishments: string;
     haveIdea: string;
     responsibilities:string[];
     interests:string[];
-    activelySeeking:boolean;
+    activelySeeking:number;
     cofounderTechnical:number;
     cofounderHasIdea:number;
     locationPreference:number;
@@ -41,14 +41,14 @@ const userSchema = new Schema({
         state: String,
         city: String
     },
-    isTechnical: { type: Boolean },
+    isTechnical: { type: Number },
     accomplishments: { type: String },
     haveIdea: { type: String },
     education: String,
     employment: String,
     responsibilities: [String],
     interests: [String],
-    activelySeeking:{type:Boolean},
+    activelySeeking:{type:Number},
     cofounderTechnical:{type:Number},
     cofounderHasIdea:{type:Number},
     locationPreference:{type:Number},

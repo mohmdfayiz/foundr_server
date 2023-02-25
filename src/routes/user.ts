@@ -7,6 +7,7 @@ import * as requestController from "../controller/user/connectionRequestControll
 import * as articleController from "../controller/user/articleController"
 import * as eventController from "../controller/user/eventController"
 import * as matchingProfile from '../controller/user/matchingProfile'
+import * as notificationController from "../controller/user/notificationController"
 
 const router = Router()
 
@@ -26,11 +27,11 @@ router
 
 router
     .route('/getUser')
-    .get(auth, usercontroller.userDetails)    
+    .get(auth, usercontroller.userDetails)
 
 router
     .route('/matchingProfiles')
-    .get(auth,matchingProfile.findMatchingProfiles)
+    .get(auth, matchingProfile.findMatchingProfiles)
 
 router
     .route('/getConnections')
@@ -39,6 +40,14 @@ router
 router
     .route('/getMessages')
     .get(auth, chatController.getMessage)
+
+router
+    .route('/getNotifications')
+    .get(auth, notificationController.getNotifications)
+
+router
+    .route('/getRequests')
+    .get(auth, requestController.getRequests)
 
 router
     .route('/getArticles')
@@ -73,23 +82,23 @@ router
 
 router
     .route('/joinEvent')
-    .post(auth,eventController.joinEvent)
+    .post(auth, eventController.joinEvent, sendMail)
 
 router
     .route('/profilePhoto')
-    .post(auth,usercontroller.profilePhoto)
+    .post(auth, usercontroller.profilePhoto)
 
 router
     .route('/updateUserProfile')
-    .post(auth,usercontroller.updateUserProfile)
+    .post(auth, usercontroller.updateUserProfile)
 
 router
     .route('/updateAbout')
-    .post(auth,usercontroller.updateAbout)
+    .post(auth, usercontroller.updateAbout)
 
 router
     .route('/updateCofounderPreference')
-    .post(auth,usercontroller.updateCofounderPreference)
+    .post(auth, usercontroller.updateCofounderPreference)
 
 router
     .route('/sendMessage')
@@ -97,8 +106,11 @@ router
 
 router
     .route('/connectionRequest')
-    .post(auth,requestController.connectionRequest)
-    .patch(requestController.updateConnectionRequst)
+    .post(auth, requestController.connectionRequest, notificationController.createNotification)
+
+router
+    .route('/updateConnectionResponse')
+    .post(auth, requestController.updateConnectionRequst,notificationController.createNotification)
 
 
 export default router;    

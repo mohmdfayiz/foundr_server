@@ -2,7 +2,7 @@ import { RequestHandler } from "express"
 import createHttpError,{InternalServerError} from "http-errors"
 import articleModel from "../../models/articleModel"
 
-// GET ARTICLES
+// GET ALL ARTICLES
 export const getArticles:RequestHandler = async (req,res,next) => {
     try {
         const articles = await articleModel.find()

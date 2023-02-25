@@ -33,28 +33,36 @@ const io = new Server(server, {
     }
 })
 
+// save online users with user id and socket id
 const onlineUsers = new Map();
 io.on("connection", (socket) => {
 
     // add user to onlineUsers if not already exist
     socket.on("addUser", (id) => { 
-        !onlineUsers.get(id) && onlineUsers.set(id, socket.id)
+            onlineUsers.set(id, socket.id)
+            console.log( id,'  connected to socket');
     })
 
     // send message to the client
     socket.on("send-msg", (data) => {
         const sendUserSocket = onlineUsers.get(data.to)
+        console.log('message reached here ready to send to ', data.to);
+        
         if (sendUserSocket) {
             socket.to(sendUserSocket).emit("msg-receive", data.message)
+            console.log(data.to, " -------------sent");
+        }else{
+            console.log('could not find socket of receiver');
         }
     })
 
-    socket.on('notification', (data) => {
-        const sendUserSocket = onlineUsers.get(data.receiver)
-        if (sendUserSocket) {
-            socket.to(sendUserSocket).emit("notification-receive", data)
-        }
-    })
+    // socket.on('notification', (data) => {
+    //     const sendUserSocket = onlineUsers.get(data.receiver)
+    //     if (sendUserSocket) {
+    //         socket.to(sendUserSocket).emit("notification-receive", data)
+    //         console.log(sendUserSocket, "notification-receive");
+    //     }
+    // })
 
     // Handle disconnections
     socket.on('disconnect', () => {

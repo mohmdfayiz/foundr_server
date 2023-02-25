@@ -1,75 +1,66 @@
 import { RequestHandler } from "express";
 import createHttpError, { InternalServerError } from "http-errors";
 import connectionRequestModel from "../../models/connectionRequestModel";
-import notificationModel from "../../models/notificationModel";
 import userModel from "../../models/userModel";
 
-export const requestNotification:RequestHandler = async(req,res,next) => {
+// get all the incoming and sented connection requests
+export const getRequests: RequestHandler = async (req, res, next) => {
     try {
-        const {userId} = res.locals.decodedToken
-        if(!userId) return next(createHttpError(401, 'Unauthorized user'))
-        const {receiver, title, message} = req.body
+        const { userId } = res.locals.decodedToken;
+        if (!userId) return next(createHttpError(401, 'Unauthorized user'))
 
-        const newNotification = new notificationModel({
-            sender:userId,
-            receiver,
-            title,
-            message
-        })
+        const connectionRequests = await connectionRequestModel.find({ $or: [{ sender: userId }, { receiver: userId }] })
 
-        await newNotification.save();
-        res.sendStatus(201)
-
-    } catch (error) {
-        return next(InternalServerError)
-    }
-};
-
-export const connectionRequest: RequestHandler = async (req, res, next) => {
-    try {
-
-        const { userId } = res.locals.decodedToken
-        if (!userId) return next(createHttpError(401, "Unauthorized user"));
-        const { to } = req.query
-    
-        const newRequest = new connectionRequestModel({
-            sender: userId,
-            receiver: to,
-        })
-
-        await newRequest.save()        
-        res.sendStatus(201)
-
+        res.status(200).send({ connectionRequests })
     } catch (error) {
         return next(InternalServerError)
     }
 }
 
+// new connection request
+export const connectionRequest: RequestHandler = async (req, res, next) => {
+    try {
+        const { userId } = res.locals.decodedToken
+        if (!userId) return next(createHttpError(401, "Unauthorized user"));
+        const { receiver } = req.body
+
+        // create a document in connection request model with default status 'pending'
+        const newRequest = new connectionRequestModel({
+            sender: userId,
+            receiver: receiver,
+        })
+        await newRequest.save()
+        next() // create notification
+    } catch (error) {
+        return next(InternalServerError)
+    }
+}
+
+// update the status of the request 
 export const updateConnectionRequst: RequestHandler = async (req, res, next) => {
     try {
+        const { userId } = res.locals.decodedToken
+        if (!userId) return next(createHttpError(401, 'Unauthorized user'))
 
-        const { requestId, accept } = req.body
-        console.log(req.body);
-        
+        const { reqFrom, response } = req.body
+
         // Find the friend request
-        const connectionRequest = await connectionRequestModel.findById(requestId);
+        const connectionRequest = await connectionRequestModel.findOneAndUpdate({ receiver: userId, sender: reqFrom });
         if (!connectionRequest) {
             return next(createHttpError(404, 'Request not found with the requestId'))
         }
 
-        // Update the status of the friend request
-        connectionRequest.status = accept ? 'accepted' : 'rejected';
+        // Update the status of the friend request based on response
+        connectionRequest.status = response ? 'accepted' : 'rejected';
         await connectionRequest.save();
-
-        // If the request was accepted, add the sender and receiver to each other's connections
-        if (accept) {
-            await userModel.findByIdAndUpdate(connectionRequest.sender, {$push:{connections:connectionRequest.receiver}});
-            await userModel.findByIdAndUpdate(connectionRequest.receiver,{$push:{connections:connectionRequest.sender}});
-            return res.status(201).json('Connection successful')
+        // If the request was accepted, add the sender and receiver to each other's connections array
+        if (response) {
+            await userModel.findByIdAndUpdate(connectionRequest.sender, { $addToSet: { connections: connectionRequest.receiver } })
+            await userModel.findByIdAndUpdate(connectionRequest.receiver, { $addToSet: { connections: connectionRequest.sender } });
+            next() // create notificationl as accepted
+        } else {
+            next(); // create notification as rejected
         }
-
-        res.sendStatus(201)
-
     } catch (error) {
         return next(InternalServerError)
     }

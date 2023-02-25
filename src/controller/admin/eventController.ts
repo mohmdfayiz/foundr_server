@@ -30,8 +30,7 @@ export const hostEvent:RequestHandler = async (req,res,next) => {
         })
         
         await newEvent.save()
-        .then((event)=>{
-            console.log(event);
+        .then(()=>{
             res.sendStatus(201)
         })
         .catch(error => {

@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import createHttpError, { InternalServerError } from "http-errors";
 import chatModel from "../../models/chatModel";
 
+// GET MESSAGES BETWEEN CURRENT USER AND A SLECTED USER
 export const getMessage: RequestHandler = async (req, res, next) => {
     try {
         const {userId} = res.locals.decodedToken;
@@ -12,6 +13,8 @@ export const getMessage: RequestHandler = async (req, res, next) => {
                 { $and: [{ sender: to }, { receiver: userId }] }
             ]
         })
+
+        // setting 'myself' as 'true' if the sender is the current user
         const allMessages = messages.map((msg) => {
             return {
                 id:msg._id,
@@ -26,13 +29,13 @@ export const getMessage: RequestHandler = async (req, res, next) => {
     }
 }
 
+// SAVE NEW MESSAGES
 export const sendMessage: RequestHandler = async (req, res, next) => {
-
     try {
         const { userId } = res.locals.decodedToken;
         if (!userId) return next(createHttpError(401, "unauthorized user!"))
         const { message, to } = req.body
-
+        
         const newMessage = new chatModel({
             sender: userId,
             receiver: to,
@@ -40,7 +43,6 @@ export const sendMessage: RequestHandler = async (req, res, next) => {
         })
         newMessage.save()
         res.status(201).json(newMessage)
-
     } catch (error) {
         return next(InternalServerError)
     }
