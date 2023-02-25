@@ -6,9 +6,9 @@ export interface Event extends Document{
     description:string;
     dateAndTime:Date;
     venue:string;
+    joinLink:string;
     mentorImage:string;
-    attendees:[Types.ObjectId];
-    feedback:[{ userId:Types.ObjectId, feedback:string }]
+    attendees:Types.ObjectId[];
 }
 
 const eventSchema = new Schema({
@@ -17,9 +17,9 @@ const eventSchema = new Schema({
     description:{ type:String, required:true },
     dateAndTime:{type:Date, required:true},
     venue:{type:String,required:true},
+    joinLink:{type:String,required:true},
     mentorImage:{type:String, required:true},
     attendees:{ type:[Types.ObjectId], ref: 'User' },
-    feedback:[{ userId:{type:Types.ObjectId, required:true}, feedback:String }]
 },
     { timestamps: true }
 )

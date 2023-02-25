@@ -26,6 +26,7 @@ export const hostEvent:RequestHandler = async (req,res,next) => {
             description:req.body.description,
             dateAndTime:req.body.dateAndTime,
             venue:req.body.venue,
+            joinLink:req.body.joinLink,
             mentorImage
         })
         

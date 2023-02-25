@@ -13,46 +13,53 @@ const router = Router()
 
 
 // GET METHODS
+
+// verify user existance before signup, if not exist => generate OTP
 router
     .route('/verifyUser')
-    .get(usercontroller.userExist);
+    .get(usercontroller.userExist, localVariables, usercontroller.generateOtp);
 
-router
-    .route('/generateOtp')
-    .get(localVariables, usercontroller.generateOtp);
-
+// verify user existance before sendign OTP for change password
 router
     .route('/authenticate')
-    .get(usercontroller.authenticate, (req, res) => res.end());
+    .get(usercontroller.authenticate, localVariables, usercontroller.generateOtp);
 
+// get logged user's details
 router
     .route('/getUser')
     .get(auth, usercontroller.userDetails)
 
+// matching profiles    
 router
     .route('/matchingProfiles')
     .get(auth, matchingProfile.findMatchingProfiles)
 
+// get connections of logged user
 router
     .route('/getConnections')
     .get(auth, usercontroller.getConnections)
 
+// get chat between logged user and selected user
 router
     .route('/getMessages')
     .get(auth, chatController.getMessage)
 
+// get Notifications
 router
     .route('/getNotifications')
     .get(auth, notificationController.getNotifications)
 
+// Connection Requests including sent and received
 router
     .route('/getRequests')
     .get(auth, requestController.getRequests)
 
+// get all articles
 router
     .route('/getArticles')
     .get(articleController.getArticles)
 
+// get all events
 router
     .route('/getEvents')
     .get(eventController.getEvents)
@@ -60,21 +67,27 @@ router
 
 
 // POST METHODS
+
+// OTP verification
 router
     .route('/verifyOtp')
     .post(usercontroller.verifyOtp)
 
+// Send mail 
 router
     .route('/sendMail')
     .post(sendMail)
 
+// sign up => save details to database
 router
     .route("/signup")
     .post(usercontroller.signup)
 
+// sign in of user
 router
     .route("/signin")
     .post(usercontroller.signin)
+
 
 router
     .route('/changePassword')
@@ -110,7 +123,11 @@ router
 
 router
     .route('/updateConnectionResponse')
-    .post(auth, requestController.updateConnectionRequst,notificationController.createNotification)
+    .post(auth, requestController.updateConnectionRequst, notificationController.createNotification)
+
+router
+    .route('/deleteConnection')
+    .post(requestController.deleteConnections)
 
 
 export default router;    

@@ -46,13 +46,9 @@ io.on("connection", (socket) => {
     // send message to the client
     socket.on("send-msg", (data) => {
         const sendUserSocket = onlineUsers.get(data.to)
-        console.log('message reached here ready to send to ', data.to);
         
         if (sendUserSocket) {
             socket.to(sendUserSocket).emit("msg-receive", data.message)
-            console.log(data.to, " -------------sent");
-        }else{
-            console.log('could not find socket of receiver');
         }
     })
 

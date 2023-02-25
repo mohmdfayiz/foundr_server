@@ -6,7 +6,7 @@ export const createNotification: RequestHandler = async (req, res, next) => {
     try {
         const { userId } = res.locals.decodedToken;
         if (!userId) return next(createHttpError(401, 'Unauthorized user'));
-        const { type,receiver, reqFrom, message } = req.body
+        const { type, receiver, reqFrom, message } = req.body
         
         // create a document in notification for request / response
         const newNotification = new notificationModel({

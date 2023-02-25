@@ -24,10 +24,8 @@ export const userExist: RequestHandler = async (req, res, next) => {
     try {
         const { email } = req.query;
         const user = await userModel.findOne({ email });
-        if (user) {
-            return res.status(400).send({ message: "Email already exists" });
-        }
-        return res.sendStatus(200) // user does not exist
+        if (user) return res.status(400).send({ message: "Email already exists" });
+        next()
     } catch (error) {
         return next(InternalServerError)
     }
@@ -222,7 +220,7 @@ export const verifyOtp: RequestHandler = async (req, res, next) => {
     if ((req.app.locals.OTP) === code) {
         req.app.locals.OTP = null; // reset the otp value
         req.app.locals.resetSession = true; //start session for reset password
-        return res.status(201).send({ msg: 'Verified Successfully.' })
+        return res.status(200).send({ msg: 'Verified Successfully.' })
     }
     return next(createHttpError(401, 'invalid OTP'))
 }
@@ -235,7 +233,7 @@ export const changePassword: RequestHandler = async (req, res, next) => {
 
         await userModel.findOneAndUpdate({ email }, { $set: { password: password } }).then((result) => {
             if (!result) return res.sendStatus(404)
-            res.sendStatus(202)
+            res.sendStatus(200)
         })
 
     } catch (error) {
