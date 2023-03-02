@@ -52,14 +52,6 @@ io.on("connection", (socket) => {
         }
     })
 
-    // socket.on('notification', (data) => {
-    //     const sendUserSocket = onlineUsers.get(data.receiver)
-    //     if (sendUserSocket) {
-    //         socket.to(sendUserSocket).emit("notification-receive", data)
-    //         console.log(sendUserSocket, "notification-receive");
-    //     }
-    // })
-
     // Handle disconnections
     socket.on('disconnect', () => {
         console.log('Client disconnected:', socket.id);

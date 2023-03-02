@@ -29,7 +29,7 @@ export const findMatchingProfiles: RequestHandler = async (req, res, next) => {
             ]
         }
 
-        const pageSize = 15
+        const pageSize = 20
         const page: string = req.query.page as string || '1'
         const skip: number = (parseInt(page) - 1) * pageSize
         const totalMatchingProfiles = await userModel.countDocuments(query);

@@ -7,6 +7,7 @@ export interface Event extends Document{
     dateAndTime:Date;
     venue:string;
     joinLink:string;
+    enrollmentFee:number;
     mentorImage:string;
     attendees:Types.ObjectId[];
 }
@@ -18,6 +19,7 @@ const eventSchema = new Schema({
     dateAndTime:{type:Date, required:true},
     venue:{type:String,required:true},
     joinLink:{type:String,required:true},
+    enrollmentFee:{type:Number,required:true},
     mentorImage:{type:String, required:true},
     attendees:{ type:[Types.ObjectId], ref: 'User' },
 },

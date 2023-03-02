@@ -125,9 +125,5 @@ router
     .route('/updateConnectionResponse')
     .post(auth, requestController.updateConnectionRequst, notificationController.createNotification)
 
-router
-    .route('/deleteConnection')
-    .post(requestController.deleteConnections)
-
 
 export default router;    

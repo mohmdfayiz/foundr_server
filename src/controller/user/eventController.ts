@@ -19,7 +19,7 @@ export const joinEvent: RequestHandler = async (req, res, next) => {
         const { userId, userName, email } = res.locals.decodedToken
         if (!userId) return next(createHttpError(401, 'Unauthorized User'))
         const { eventId, joinLink } = req.body;
-        await eventModel.findOneAndUpdate({ _id: eventId }, { $push: { attendees: userId } });
+        await eventModel.findOneAndUpdate({ _id: eventId }, { $addToSet: { attendees: userId } });
         const subject = 'Event invitation';
         const content = 'invitation';
         const updatedBody = { ...req.body, userName, email, subject, joinLink, content }

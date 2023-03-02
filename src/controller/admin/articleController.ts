@@ -15,18 +15,31 @@ export const getArticles: RequestHandler = async (req, res, next) => {
 }
 
 // Publish a new article
-export const publishArticle: RequestHandler = async (req, res) => {
-
-    const coverImage = await fileUploader(req.body.coverImage)
-    const newArticle = new articleModel({
-        title: req.body.title,
-        content: req.body.content,
-        coverImage
-    })
-    await newArticle.save()
-        .then((article) => {
-            console.log(article);
-            res.sendStatus(201)
+export const publishArticle: RequestHandler = async (req, res, next) => {
+    try {
+        const coverImage = await fileUploader(req.body.coverImage)
+        const newArticle = new articleModel({
+            title: req.body.title,
+            content: req.body.content,
+            coverImage
         })
-        .catch((err) => console.log(err))
+        await newArticle.save()
+        res.sendStatus(201)
+    } catch (error) {
+        return next(InternalServerError)
+    }
+
+}
+
+// UPDATE ARTICLE VISIBILITY
+export const updateVisibility: RequestHandler = async (req, res, next) => {
+    try {
+        const {articleId} = req.query
+        const article = await articleModel.findById(articleId)
+        const isHide = article?.isHide ? false : true;
+        await articleModel.findByIdAndUpdate(articleId, {$set:{isHide}})
+        res.sendStatus(200)
+    } catch (error) {
+        return next(InternalServerError)
+    }
 }

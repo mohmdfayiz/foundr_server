@@ -1,16 +1,7 @@
 import { RequestHandler } from "express";
 import createHttpError, { InternalServerError } from "http-errors";
 import connectionRequestModel from "../../models/connectionRequestModel";
-import notificationModel from "../../models/notificationModel";
 import userModel from "../../models/userModel";
-
-// delete connections
-export const deleteConnections: RequestHandler = async (req, res) => {
-    await userModel.updateMany({}, { $unset: { connections: 1 } })
-    await connectionRequestModel.deleteMany({})
-    await notificationModel.deleteMany({})
-    res.sendStatus(201)
-}
 
 // get all the incoming and sented connection requests
 export const getRequests: RequestHandler = async (req, res, next) => {

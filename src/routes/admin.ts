@@ -10,16 +10,28 @@ router
     .get(userController.getUsers)
 
 router
+    .route('/updateUserStatus')
+    .patch(userController.updateUserStatus)
+
+router
     .route('/getArticles')
     .get(articleController.getArticles);
 
 router
     .route('/publishArticle')
     .post(articleController.publishArticle);
+
+router
+    .route('/updateArticleVisibility')
+    .patch(articleController.updateVisibility)
     
 router
     .route('/getEvents')
-    .get(eventController.getEvents);   
+    .get(eventController.getEvents);  
+    
+router
+    .route('/getAttendies')
+    .get(eventController.getAttendies);
     
 router
     .route('/hostEvent')

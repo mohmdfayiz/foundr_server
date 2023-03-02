@@ -1,11 +1,11 @@
 import { RequestHandler } from "express";
 import eventModel from "../../models/eventModel";
-import createHttpError, {InternalServerError} from "http-errors";
+import createHttpError, { InternalServerError } from "http-errors";
 import fileUploader from "../../util/fileUploader";
 
 
-// Get all the events
-export const getEvents:RequestHandler = async (req,res,next) =>{
+// Get all events
+export const getEvents: RequestHandler = async (req, res, next) => {
     try {
         const events = await eventModel.find()
         if (!events) return next(createHttpError(501, 'Could not retrieve data.'))
@@ -15,33 +15,47 @@ export const getEvents:RequestHandler = async (req,res,next) =>{
     }
 }
 
+// GET ATTENDIES OF EVENT
+export const getAttendies: RequestHandler = async (req, res, next) => {
+    try {
+        const { eventId } = req.query
+        const event = await eventModel.findById(eventId,{attendees:1}).populate('attendees')
+        const attendees = event?.attendees
+        res.status(200).json({attendees})
+        
+    } catch (error) {
+        return next(InternalServerError)
+    }
+}
+
 // Host a new Event
-export const hostEvent:RequestHandler = async (req,res,next) => {
-    
+export const hostEvent: RequestHandler = async (req, res, next) => {
+
     try {
         const mentorImage = await fileUploader(req.body.mentorImage)
         const newEvent = new eventModel({
-            mentorName:req.body.mentorName,
-            title:req.body.title,
-            description:req.body.description,
-            dateAndTime:req.body.dateAndTime,
-            venue:req.body.venue,
-            joinLink:req.body.joinLink,
+            mentorName: req.body.mentorName,
+            title: req.body.title,
+            description: req.body.description,
+            dateAndTime: req.body.dateAndTime,
+            venue: req.body.venue,
+            joinLink: req.body.joinLink,
+            enrollmentFee:req.body.enrollmentFee,
             mentorImage
         })
-        
+
         await newEvent.save()
-        .then(()=>{
-            res.sendStatus(201)
-        })
-        .catch(error => {
-            console.log(error)
-            return next(createHttpError(400,'Error occured!'))
-        })
+            .then(() => {
+                res.sendStatus(201)
+            })
+            .catch(error => {
+                console.log(error)
+                return next(createHttpError(400, 'Error occured!'))
+            })
 
     } catch (error) {
         console.log(error);
         return next(InternalServerError)
     }
-    
+
 }
