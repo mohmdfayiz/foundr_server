@@ -21,7 +21,7 @@ app.use(express.urlencoded({ limit: "5mb", extended: true, parameterLimit: 50000
 app.use(morgan('dev'))
 
 // health check
-app.get('/', (req, res) => {res.status(200).send('Hello')})
+app.get('/', (req, res) => {res.status(200).json({message: 'OK'})})
 
 // api routes
 app.use('/api/user', userRouter);
