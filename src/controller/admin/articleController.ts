@@ -6,7 +6,7 @@ import fileUploader from "../../util/fileUploader";
 // Get all the articles
 export const getArticles: RequestHandler = async (req, res, next) => {
     try {
-        const articles = await articleModel.find();
+        const articles = await articleModel.find().sort({createdAt:-1})
         if (!articles) return next(createHttpError(501, 'Could not retrieve data.'))
         res.status(200).send(articles)
     } catch (error) {

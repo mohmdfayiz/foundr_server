@@ -6,7 +6,7 @@ import userModel from "../../models/userModel";
 export const getUsers: RequestHandler = async (req, res, next) => {
 
     try {
-        const allUsers = await userModel.find()
+        const allUsers = await userModel.find().sort({createdAt:-1})
         if (!allUsers) { return next(createHttpError(404, 'Could not find users')) }
         res.status(200).send(allUsers)
     } catch (error) {

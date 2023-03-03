@@ -7,7 +7,7 @@ import fileUploader from "../../util/fileUploader";
 // Get all events
 export const getEvents: RequestHandler = async (req, res, next) => {
     try {
-        const events = await eventModel.find()
+        const events = await eventModel.find().sort({dateAndTime:-1})
         if (!events) return next(createHttpError(501, 'Could not retrieve data.'))
         res.status(200).send(events)
     } catch (error) {
