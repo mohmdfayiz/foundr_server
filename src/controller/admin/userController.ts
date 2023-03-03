@@ -25,7 +25,6 @@ export const updateUserStatus: RequestHandler = async (req, res, next) => {
         await userModel.findOneAndUpdate({ _id: userId }, { $set: { status } })
         res.sendStatus(200)
     } catch (error) {
-        console.log(error);
         return next(InternalServerError)
     }
 }

@@ -48,13 +48,11 @@ export const hostEvent: RequestHandler = async (req, res, next) => {
             .then(() => {
                 res.sendStatus(201)
             })
-            .catch(error => {
-                console.log(error)
+            .catch(() => {
                 return next(createHttpError(400, 'Error occured!'))
             })
 
     } catch (error) {
-        console.log(error);
         return next(InternalServerError)
     }
 

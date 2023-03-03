@@ -3,7 +3,6 @@ import createHttpError, { InternalServerError } from "http-errors";
 import jwt from 'jsonwebtoken'
 import env from '../util/validateEnv'
 
-
 export const auth = async (req: Request, res: Response, next: NextFunction) => {
     try {
         //   get the token from the authorization header
@@ -14,7 +13,6 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
         next()
 
     } catch (error) {
-        console.log(error);
         return next(InternalServerError)
     }
 }

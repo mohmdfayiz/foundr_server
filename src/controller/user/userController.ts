@@ -7,7 +7,7 @@ import env from "../../util/validateEnv";
 import otpGenerator from 'otp-generator'
 import fileUploader from "../../util/fileUploader";
 
-/* middleware for  user authentication */
+// middleware for  user authentication 
 export const authenticate: RequestHandler = async (req, res, next) => {
     try {
         const { email } = req.method == "GET" ? req.query : req.body;
@@ -55,7 +55,7 @@ export const signup: RequestHandler = async (req, res, next) => {
                         userName: newUser.userName
                     }, env.JWT_SECRET, { expiresIn: "24h" });
 
-                    return res.status(201).send({
+                    return res.status(201).json({
                         message: "Signup Successful...",
                         token,
                     })
@@ -68,11 +68,11 @@ export const signup: RequestHandler = async (req, res, next) => {
     }
 }
 
-// USER SIGNIN
+// USER SIGN IN
 export const signin: RequestHandler = async (req, res, next) => {
     const { email, password } = req.body;
     try {
-        const user = await userModel.findOne({ email })
+        const user = await userModel.findOne({ email, status:"Active" })
         if (!user) return next(createHttpError(404, 'User not found!'));
 
         const isValidPassword = await bcrypt.compare(password, user.password);
@@ -84,13 +84,12 @@ export const signin: RequestHandler = async (req, res, next) => {
             email:user.email,
             userName: user.userName
         }, env.JWT_SECRET, { expiresIn: "24h" });
-        return res.status(200).send({
-            message: "Login Successful...",
+        return res.status(200).json({
+            message: "Signin Successful...",
             token
         })
 
     } catch (error) {
-        console.log(error);
         return next(InternalServerError)
     }
 }
@@ -122,12 +121,10 @@ export const profilePhoto:RequestHandler = async (req,res,next) => {
         
         fileUploader(profilePhoto)
         .then(async (profilePhoto)=>{
-            console.log(profilePhoto);
             await userModel.updateOne({_id:userId},{$set:{profilePhoto}})
             res.sendStatus(201)
         })
     } catch (error) {
-        console.log(error);
         return next(InternalServerError)
     }
 }
@@ -181,7 +178,6 @@ export const matchingProfiles: RequestHandler = async (req, res, next) => {
         const profiles = await userModel.find({ _id: { $ne: userId }, 'connections.user': { $ne: userId } })
         res.status(200).send(profiles)
     } catch (error) {
-        console.log(error);
         return next(InternalServerError)
     }
 }
@@ -214,7 +210,6 @@ export const generateOtp: RequestHandler = async (req, res, next) => {
 // VERIFY OTP
 export const verifyOtp: RequestHandler = async (req, res, next) => {
     const { code } = req.query;
-    console.log(code);
 
     if (!code) return next(createHttpError(501, 'invalid OTP'))
     if ((req.app.locals.OTP) === code) {

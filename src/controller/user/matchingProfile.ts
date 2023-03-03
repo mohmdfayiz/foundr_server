@@ -98,12 +98,8 @@ export const findMatchingProfiles: RequestHandler = async (req, res, next) => {
             return profiles.map((p) => p.profile);
         });
 
-        // return { profiles: sortedProfiles, page, totalPages };
-        // console.log(sortedProfiles, page, totalPages);
-        res.status(200).send({matchingProfiles:sortedProfiles, page, totalPages})
-
+        res.status(200).json({matchingProfiles:sortedProfiles, page, totalPages})
     } catch (error) {
-        console.log(error);
         return next(InternalServerError)
     }
 }

@@ -10,7 +10,6 @@ export const getRequests: RequestHandler = async (req, res, next) => {
         if (!userId) return next(createHttpError(401, 'Unauthorized user'))
 
         const connectionRequests = await connectionRequestModel.find({ $or: [{ sender: userId }, { receiver: userId }] })
-
         res.status(200).send({ connectionRequests })
     } catch (error) {
         return next(InternalServerError)

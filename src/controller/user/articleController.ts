@@ -5,7 +5,7 @@ import articleModel from "../../models/articleModel"
 // GET ALL ARTICLES
 export const getArticles:RequestHandler = async (req,res,next) => {
     try {
-        const articles = await articleModel.find()
+        const articles = await articleModel.find({isHide:false})
         if(!articles) return next(createHttpError(404, 'Articles could not found'))
         res.status(200).send({articles})
     } catch (error) {

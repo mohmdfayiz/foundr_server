@@ -20,9 +20,13 @@ app.use(express.json({ limit: "5mb" }))
 app.use(express.urlencoded({ limit: "5mb", extended: true, parameterLimit: 50000 }))
 app.use(morgan('dev'))
 
+// health check
+app.get('/', (req, res) => {res.status(200).send('Hello')})
+
 // api routes
 app.use('/api/user', userRouter);
 app.use('/api/admin', adminRoute);
+  
 app.use(() => { throw createHttpError(404, 'Route not found') });
 app.use(errorHandler);
 
@@ -37,16 +41,15 @@ const io = new Server(server, {
 const onlineUsers = new Map();
 io.on("connection", (socket) => {
 
-    // add user to onlineUsers if not already exist
-    socket.on("addUser", (id) => { 
-            onlineUsers.set(id, socket.id)
-            console.log( id,'  connected to socket');
+    // add user to onlineUsers
+    socket.on("addUser", (id) => {
+        onlineUsers.set(id, socket.id)
     })
 
     // send message to the client
     socket.on("send-msg", (data) => {
         const sendUserSocket = onlineUsers.get(data.to)
-        
+
         if (sendUserSocket) {
             socket.to(sendUserSocket).emit("msg-receive", data.message)
         }

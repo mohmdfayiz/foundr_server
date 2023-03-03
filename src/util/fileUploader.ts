@@ -28,10 +28,8 @@ export default (image: string): Promise<string> => {
     
     cloudinary.uploader.upload(image, opts, (error, result) => {
       if (result && result.secure_url) {
-        console.log(result.secure_url);
         return resolve(result.secure_url);
       } else if (error) {
-        console.log(error.message);
         return reject({ message: error.message });
       }
     });

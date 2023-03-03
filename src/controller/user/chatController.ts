@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import createHttpError, { InternalServerError } from "http-errors";
 import chatModel from "../../models/chatModel";
 
-// GET MESSAGES BETWEEN CURRENT USER AND A SLECTED USER
+// GET MESSAGES BETWEEN LOGGED USER AND A SLECTED USER
 export const getMessage: RequestHandler = async (req, res, next) => {
     try {
         const {userId} = res.locals.decodedToken;
@@ -14,7 +14,7 @@ export const getMessage: RequestHandler = async (req, res, next) => {
             ]
         })
 
-        // setting 'myself' as 'true' if the sender is the current user
+        // setting 'myself' as 'true' if the sender is the logged user
         const allMessages = messages.map((msg) => {
             return {
                 id:msg._id,

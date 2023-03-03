@@ -31,14 +31,11 @@ export async function sendMail(req: Request, res: Response, next: NextFunction) 
     theme: 'default',
     product: {
       name: 'foundr.',
-      // logo: 'https://res.cloudinary.com/dofck6ix9/image/upload/v1677396733/logo_mg27af.svg',
-      // logoHeight: '30px',
       link: 'https://foundr-for-find-a-cofounder.netlify.app/'
     }
   })
 
-  console.log(joinLink);
-  
+  // EVENT INVITATION CONTENT
   const invitation = {
     body: {
       greeting: 'Congratulations',
@@ -56,6 +53,7 @@ export async function sendMail(req: Request, res: Response, next: NextFunction) 
     }
   };
 
+  // EMAIL VERIFICATION CONTENT
   const emailVerificaton = {
     body: {
       name: userName,
@@ -78,7 +76,7 @@ export async function sendMail(req: Request, res: Response, next: NextFunction) 
   await transporter.sendMail(message).then((info) => {
 
     res.status(201).json({
-      message: 'message sent successfully',
+      message: 'mail sent successfully',
       info: info.messageId,
       preview: nodemailer.getTestMessageUrl(info)
     })

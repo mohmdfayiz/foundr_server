@@ -5,7 +5,8 @@ import eventModel from "../../models/eventModel";
 // GET ALL EVENTS
 export const getEvents: RequestHandler = async (req, res, next) => {
     try {
-        const events = await eventModel.find();
+        const today = new Date();
+        const events = await eventModel.find({dateAndTime:{$gte: today}});
         if (!events) return next(createHttpError(404, 'Events could not find'));
         res.status(200).send({ events })
     } catch (error) {
