@@ -20,7 +20,6 @@ export const getEvent: RequestHandler = async (req,res,next) => {
         const {eventId} = req.query
         if(!eventId) return next(createHttpError(400,'Event id not provided'))
         const event = await eventModel.findById(eventId)
-        console.log(event);
         res.status(200).json({event})
     } catch (error) {
         return next(InternalServerError)

@@ -23,7 +23,6 @@ export const getMessage: RequestHandler = async (req, res, next) => {
                 time: msg.createdAt,
             }
         })
-        console.log(allMessages);
         res.status(200).json(allMessages)
 
     } catch (error) {
