@@ -33,7 +33,12 @@ app.use(errorHandler);
 const io = new Server(server, {
     cors: {
         origin: env.FRONT_END_URL,
-        credentials: true
+        credentials: true,
+        allowedHeaders:[
+            'Content-Type',
+            'Access',
+            'Authorization'
+        ]
     }
 })
 
@@ -49,7 +54,6 @@ io.on("connection", (socket) => {
     // send message to the client
     socket.on("send-msg", (data) => {
         const sendUserSocket = onlineUsers.get(data.to)
-
         if (sendUserSocket) {
             socket.to(sendUserSocket).emit("msg-receive", data.message)
         }
@@ -62,7 +66,7 @@ io.on("connection", (socket) => {
 
 })
 
-const port = env.PORT;
+const port = env.PORT || 5000
 database(env.MONGO_CONNECTION_STRING);
 
 server.listen(port, () => {

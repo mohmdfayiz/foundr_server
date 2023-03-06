@@ -3,7 +3,8 @@ import { Document, model, Schema, Types } from "mongoose";
 export interface IChat extends Document{
     sender:Types.ObjectId,
     receiver:Types.ObjectId,
-    message:string
+    message:string,
+    createdAt:Date,
 }
 
 const chatSchema = new Schema({

@@ -64,7 +64,10 @@ router
     .route('/getEvents')
     .get(eventController.getEvents)
 
-
+// get a single event 
+router
+    .route('/getEvent')
+    .get(eventController.getEvent)
 
 // POST METHODS
 
@@ -88,15 +91,17 @@ router
     .route("/signin")
     .post(usercontroller.signin)
 
-
+// change password
 router
     .route('/changePassword')
     .post(usercontroller.changePassword)
 
+// join to a event
 router
     .route('/joinEvent')
     .post(auth, eventController.joinEvent, sendMail)
 
+// upload profile photo
 router
     .route('/profilePhoto')
     .post(auth, usercontroller.profilePhoto)
