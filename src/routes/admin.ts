@@ -2,8 +2,13 @@ import { Router } from "express"
 import * as articleController from "../controller/admin/articleController"
 import * as eventController from "../controller/admin/eventController"
 import * as userController from "../controller/admin/userController"
+import * as dashboardController from "../controller/admin/dashboardController"
 
 const router = Router();
+
+router
+    .route('/dashboardDetails')
+    .get(dashboardController.dashboardDetails)
 
 router
     .route('/getUsers')
