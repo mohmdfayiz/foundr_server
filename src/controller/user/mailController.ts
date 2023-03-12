@@ -31,7 +31,7 @@ export async function sendMail(req: Request, res: Response, next: NextFunction) 
     theme: 'default',
     product: {
       name: 'foundr.',
-      link: 'https://foundr-for-find-a-cofounder.netlify.app/'
+      link: 'https://www.foundr.site/'
     }
   })
 
@@ -49,7 +49,8 @@ export async function sendMail(req: Request, res: Response, next: NextFunction) 
           link: joinLink,
         }
       },
-      outro: 'We are excited to see you there.'
+      outro: 'We are excited to see you there.',
+      signature: 'Cheers,'
     }
   };
 

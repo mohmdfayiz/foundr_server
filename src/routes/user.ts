@@ -11,9 +11,6 @@ import * as notificationController from "../controller/user/notificationControll
 
 const router = Router()
 
-
-// GET METHODS
-
 // verify user existance before signup, if not exist => generate OTP
 router
     .route('/verifyUser')
@@ -59,6 +56,11 @@ router
     .route('/getArticles')
     .get(articleController.getArticles)
 
+// get a single article    
+router
+    .route('/getArticle')
+    .get(articleController.getArticle)    
+
 // get all events
 router
     .route('/getEvents')
@@ -68,8 +70,6 @@ router
 router
     .route('/getEvent')
     .get(eventController.getEvent)
-
-// POST METHODS
 
 // OTP verification
 router
@@ -106,26 +106,32 @@ router
     .route('/profilePhoto')
     .post(auth, usercontroller.profilePhoto)
 
+// update user profile
 router
     .route('/updateUserProfile')
     .post(auth, usercontroller.updateUserProfile)
 
+// update about user     
 router
     .route('/updateAbout')
     .post(auth, usercontroller.updateAbout)
 
+// update cofounder preference    
 router
     .route('/updateCofounderPreference')
     .post(auth, usercontroller.updateCofounderPreference)
 
+// send message    
 router
     .route('/sendMessage')
     .post(auth, chatController.sendMessage)
 
+// new connection request    
 router
     .route('/connectionRequest')
     .post(auth, requestController.connectionRequest, notificationController.createNotification)
 
+// update connection request status    
 router
     .route('/updateConnectionResponse')
     .post(auth, requestController.updateConnectionRequst, notificationController.createNotification)

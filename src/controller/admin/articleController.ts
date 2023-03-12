@@ -26,7 +26,7 @@ export const publishArticle: RequestHandler = async (req, res, next) => {
         await newArticle.save()
         res.sendStatus(201)
     } catch (error) {
-        return next(InternalServerError)
+        return next(createHttpError(400,"Invalid input"))
     }
 
 }

@@ -42,7 +42,7 @@ export const updateConnectionRequst: RequestHandler = async (req, res, next) => 
         if (!userId) return next(createHttpError(401, 'Unauthorized user'))
         const { reqFrom, response } = req.body
 
-        // Update the status of the friend request based on response
+        // Update the status of the connection request based on response
         const status = response ? 'accepted' : 'rejected';
         const connectionRequest = await connectionRequestModel.findOneAndUpdate({ receiver: userId, sender: reqFrom }, { $set: { status } });
         if (!connectionRequest) {

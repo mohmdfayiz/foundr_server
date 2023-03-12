@@ -51,7 +51,7 @@ export const signup: RequestHandler = async (req, res, next) => {
                     // create jwt token
                     const token = jwt.sign({
                         userId: newUser._id,
-                        email:newUser.email,
+                        email: newUser.email,
                         userName: newUser.userName
                     }, env.JWT_SECRET, { expiresIn: "24h" });
 
@@ -72,7 +72,7 @@ export const signup: RequestHandler = async (req, res, next) => {
 export const signin: RequestHandler = async (req, res, next) => {
     const { email, password } = req.body;
     try {
-        const user = await userModel.findOne({ email, status:"Active" })
+        const user = await userModel.findOne({ email, status: "Active" })
         if (!user) return next(createHttpError(404, 'User not found!'));
 
         const isValidPassword = await bcrypt.compare(password, user.password);
@@ -81,7 +81,7 @@ export const signin: RequestHandler = async (req, res, next) => {
         // create jwt token
         const token = jwt.sign({
             userId: user._id,
-            email:user.email,
+            email: user.email,
             userName: user.userName
         }, env.JWT_SECRET, { expiresIn: "24h" });
         return res.status(200).json({
@@ -113,17 +113,17 @@ export const userDetails: RequestHandler = async (req, res, next) => {
 }
 
 // PROFILE PHOTO
-export const profilePhoto:RequestHandler = async (req,res,next) => {
+export const profilePhoto: RequestHandler = async (req, res, next) => {
     try {
-        const {userId} = res.locals.decodedToken;
-        if(!userId) return next(createHttpError(401, 'Unauthorized user'))
+        const { userId } = res.locals.decodedToken;
+        if (!userId) return next(createHttpError(401, 'Unauthorized user'))
         const profilePhoto = req.body.file;
-        
+
         fileUploader(profilePhoto)
-        .then(async (profilePhoto)=>{
-            await userModel.updateOne({_id:userId},{$set:{profilePhoto}})
-            res.sendStatus(201)
-        })
+            .then(async (profilePhoto) => {
+                await userModel.updateOne({ _id: userId }, { $set: { profilePhoto } })
+                res.sendStatus(201)
+            }).catch(() => next(createHttpError(400, 'Invalid input')))
     } catch (error) {
         return next(InternalServerError)
     }
@@ -144,27 +144,27 @@ export const updateUserProfile: RequestHandler = async (req, res, next) => {
 }
 
 // UPDATE ABOUT USER
-export const updateAbout:RequestHandler = async (req,res,next) => {
+export const updateAbout: RequestHandler = async (req, res, next) => {
     try {
-        const {userId} = res.locals.decodedToken;
-        if(!userId) return next(createHttpError(401, 'Unauthorized User'))
-        const {isTechnical, haveIdea, accomplishments, education, employment, responsibilities, interests} = req.body
-        
-        await userModel.updateOne({_id:userId}, {$set:{isTechnical,haveIdea,accomplishments,education,employment,responsibilities,interests}})
-        res.status(201).send({message: 'Updated successfully'})
+        const { userId } = res.locals.decodedToken;
+        if (!userId) return next(createHttpError(401, 'Unauthorized User'))
+        const { isTechnical, haveIdea, accomplishments, education, employment, responsibilities, interests } = req.body
+
+        await userModel.updateOne({ _id: userId }, { $set: { isTechnical, haveIdea, accomplishments, education, employment, responsibilities, interests } })
+        res.status(201).send({ message: 'Updated successfully' })
     } catch (error) {
         return next(InternalServerError)
     }
 }
 
 // UPDATE COFOUNDER PREFERENCE
-export const updateCofounderPreference:RequestHandler = async (req,res,next) =>{
+export const updateCofounderPreference: RequestHandler = async (req, res, next) => {
     try {
-        const {userId} = res.locals.decodedToken;
-        if(!userId) return next(createHttpError(401, 'Unauthorized user'))
-        const {activelySeeking, cofounderTechnical, cofounderHasIdea, locationPreference, cofounderResponsibilities} = req.body
-        await userModel.updateOne({_id:userId}, {$set:{activelySeeking, cofounderTechnical, cofounderHasIdea, locationPreference, cofounderResponsibilities}})
-        res.status(201).send({message:'cofounder preference updated successfully'})
+        const { userId } = res.locals.decodedToken;
+        if (!userId) return next(createHttpError(401, 'Unauthorized user'))
+        const { activelySeeking, cofounderTechnical, cofounderHasIdea, locationPreference, cofounderResponsibilities } = req.body
+        await userModel.updateOne({ _id: userId }, { $set: { activelySeeking, cofounderTechnical, cofounderHasIdea, locationPreference, cofounderResponsibilities } })
+        res.status(201).send({ message: 'cofounder preference updated successfully' })
     } catch (error) {
         return next(InternalServerError)
     }
@@ -189,7 +189,7 @@ export const getConnections: RequestHandler = async (req, res, next) => {
         if (!userId) return next(createHttpError(401, "unauthorized user"));
 
         const connectedUsers = await userModel.findById(userId).populate('connections').select({ connections: 1, _id: 0 })
-       
+
         res.status(200).json(connectedUsers)
 
     } catch (error) {
@@ -209,7 +209,7 @@ export const generateOtp: RequestHandler = async (req, res, next) => {
 
 // VERIFY OTP
 export const verifyOtp: RequestHandler = async (req, res, next) => {
-    const { code } = req.query;
+    const { code } = req.body; // 🛑 changed from query to body 🛑
 
     if (!code) return next(createHttpError(501, 'invalid OTP'))
     if ((req.app.locals.OTP) === code) {
