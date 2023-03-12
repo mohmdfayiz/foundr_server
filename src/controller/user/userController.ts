@@ -112,7 +112,19 @@ export const userDetails: RequestHandler = async (req, res, next) => {
     }
 }
 
-// PROFILE PHOTO
+// GET PROFILE PHOTO
+export const getProfilePhoto:RequestHandler = async (req,res,next) => {
+    try {
+        const {userId} = res.locals.decodedToken;
+        if(!userId) return next(createHttpError(401, 'Unauthorized user'))
+        const user = await userModel.findById(userId)
+        res.status(200).json({profilePhoto: user?.profilePhoto || null})
+    } catch (error) {
+        return next(InternalServerError)
+    }
+}
+
+// ADD PROFILE PHOTO
 export const profilePhoto: RequestHandler = async (req, res, next) => {
     try {
         const { userId } = res.locals.decodedToken;
@@ -165,33 +177,6 @@ export const updateCofounderPreference: RequestHandler = async (req, res, next) 
         const { activelySeeking, cofounderTechnical, cofounderHasIdea, locationPreference, cofounderResponsibilities } = req.body
         await userModel.updateOne({ _id: userId }, { $set: { activelySeeking, cofounderTechnical, cofounderHasIdea, locationPreference, cofounderResponsibilities } })
         res.status(201).send({ message: 'cofounder preference updated successfully' })
-    } catch (error) {
-        return next(InternalServerError)
-    }
-}
-
-// MATCHING PROFILES
-export const matchingProfiles: RequestHandler = async (req, res, next) => {
-    try {
-        const { userId } = res.locals.decodedToken;
-        if (!userId) return next(createHttpError(401, 'Unauthorized user'))
-        const profiles = await userModel.find({ _id: { $ne: userId }, 'connections.user': { $ne: userId } })
-        res.status(200).send(profiles)
-    } catch (error) {
-        return next(InternalServerError)
-    }
-}
-
-// GET CONNCTIONS
-export const getConnections: RequestHandler = async (req, res, next) => {
-    try {
-        const { userId } = res.locals.decodedToken
-        if (!userId) return next(createHttpError(401, "unauthorized user"));
-
-        const connectedUsers = await userModel.findById(userId).populate('connections').select({ connections: 1, _id: 0 })
-
-        res.status(200).json(connectedUsers)
-
     } catch (error) {
         return next(InternalServerError)
     }

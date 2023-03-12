@@ -3,6 +3,21 @@ import createHttpError, { InternalServerError } from "http-errors";
 import connectionRequestModel from "../../models/connectionRequestModel";
 import userModel from "../../models/userModel";
 
+// GET CONNCTIONS
+export const getConnections: RequestHandler = async (req, res, next) => {
+    try {
+        const { userId } = res.locals.decodedToken
+        if (!userId) return next(createHttpError(401, "unauthorized user"));
+
+        const connectedUsers = await userModel.findById(userId).populate('connections').select({ connections: 1, _id: 0 })
+
+        res.status(200).json(connectedUsers)
+
+    } catch (error) {
+        return next(InternalServerError)
+    }
+}
+
 // get all the incoming and sented connection requests
 export const getRequests: RequestHandler = async (req, res, next) => {
     try {

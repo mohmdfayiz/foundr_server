@@ -69,7 +69,7 @@ router
 // get connections of logged user
 router
     .route('/getConnections')
-    .get(auth, usercontroller.getConnections)
+    .get(auth, requestController.getConnections)
 
 // messages
 router
@@ -94,9 +94,10 @@ router
     .route('/joinEvent')
     .post(auth, eventController.joinEvent, sendMail)
 
-// upload profile photo
+// profile photo
 router
     .route('/profilePhoto')
+    .get(auth, usercontroller.getProfilePhoto)
     .post(auth, usercontroller.profilePhoto)
 
 // update user profile
