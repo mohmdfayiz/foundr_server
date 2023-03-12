@@ -50,7 +50,7 @@ export async function sendMail(req: Request, res: Response, next: NextFunction) 
         }
       },
       outro: 'We are excited to see you there.',
-      signature: 'Cheers,'
+      signature: 'Cheers...'
     }
   };
 

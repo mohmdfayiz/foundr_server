@@ -2,25 +2,15 @@ import { RequestHandler } from "express";
 import createHttpError, { InternalServerError } from "http-errors";
 import eventModel from "../../models/eventModel";
 
-// GET ALL EVENTS
+// GET EVENTS / SINGLE EVENT DETAILS
 export const getEvents: RequestHandler = async (req, res, next) => {
     try {
         const today = new Date();
-        const events = await eventModel.find({dateAndTime:{$gte: today}}).sort({dateAndTime:1});
+        const query = req.query.eventId ? { _id: req.query.eventId, dateAndTime: { $gte: today } } : { dateAndTime: { $gte: today } };
+        
+        const events = await eventModel.find(query).sort({ dateAndTime: 1 });
         if (!events) return next(createHttpError(404, 'Events could not find'));
         res.status(200).json({ events })
-    } catch (error) {
-        return next(InternalServerError)
-    }
-}
-
-// GET A SINGLE EVENT
-export const getEvent: RequestHandler = async (req,res,next) => {
-    try {
-        const {eventId} = req.query
-        if(!eventId) return next(createHttpError(400,'Event id not provided'))
-        const event = await eventModel.findById(eventId)
-        res.status(200).json({event})
     } catch (error) {
         return next(InternalServerError)
     }

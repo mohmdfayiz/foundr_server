@@ -21,55 +21,15 @@ router
     .route('/authenticate')
     .get(usercontroller.authenticate, localVariables, usercontroller.generateOtp);
 
-// get logged user's details
-router
-    .route('/getUser')
-    .get(auth, usercontroller.userDetails)
-
-// matching profiles    
-router
-    .route('/matchingProfiles')
-    .get(auth, matchingProfile.findMatchingProfiles)
-
-// get connections of logged user
-router
-    .route('/getConnections')
-    .get(auth, usercontroller.getConnections)
-
-// get chat between logged user and selected user
-router
-    .route('/getMessages')
-    .get(auth, chatController.getMessage)
-
-// get Notifications
-router
-    .route('/getNotifications')
-    .get(auth, notificationController.getNotifications)
-
-// Connection Requests including sent and received
-router
-    .route('/getRequests')
-    .get(auth, requestController.getRequests)
-
-// get all articles
+// get all articles / single article => req.query.articleId
 router
     .route('/getArticles')
-    .get(articleController.getArticles)
+    .get(articleController.getArticles) 
 
-// get a single article    
-router
-    .route('/getArticle')
-    .get(articleController.getArticle)    
-
-// get all events
+// get all events / single event  => req.query.eventId
 router
     .route('/getEvents')
     .get(eventController.getEvents)
-
-// get a single event 
-router
-    .route('/getEvent')
-    .get(eventController.getEvent)
 
 // OTP verification
 router
@@ -96,6 +56,39 @@ router
     .route('/changePassword')
     .post(usercontroller.changePassword)
 
+// get logged user's details
+router
+    .route('/getUser')
+    .get(auth, usercontroller.userDetails)
+
+// matching profiles    
+router
+    .route('/matchingProfiles')
+    .get(auth, matchingProfile.findMatchingProfiles)
+
+// get connections of logged user
+router
+    .route('/getConnections')
+    .get(auth, usercontroller.getConnections)
+
+// messages
+router
+    .route('/message')
+    .get(auth, chatController.getMessage)
+    .post(auth,chatController.sendMessage)
+
+// get Notifications
+router
+    .route('/getNotifications')
+    .get(auth, notificationController.getNotifications)
+
+// Connection Requests
+router
+    .route('/connectionRequest')
+    .get(auth, requestController.getRequests)
+    .post(auth, requestController.connectionRequest, notificationController.createNotification)
+    .patch(auth, requestController.updateConnectionRequst, notificationController.createNotification)
+
 // join to a event
 router
     .route('/joinEvent')
@@ -120,21 +113,5 @@ router
 router
     .route('/updateCofounderPreference')
     .post(auth, usercontroller.updateCofounderPreference)
-
-// send message    
-router
-    .route('/sendMessage')
-    .post(auth, chatController.sendMessage)
-
-// new connection request    
-router
-    .route('/connectionRequest')
-    .post(auth, requestController.connectionRequest, notificationController.createNotification)
-
-// update connection request status    
-router
-    .route('/updateConnectionResponse')
-    .post(auth, requestController.updateConnectionRequst, notificationController.createNotification)
-
 
 export default router;    
