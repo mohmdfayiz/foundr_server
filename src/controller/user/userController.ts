@@ -83,7 +83,7 @@ export const signin: RequestHandler = async (req, res, next) => {
             userId: user._id,
             email: user.email,
             userName: user.userName
-        }, env.JWT_SECRET, { expiresIn: "24h" });
+        }, env.JWT_SECRET, { expiresIn: "1d" });
         return res.status(200).json({
             message: "Signin Successful...",
             token
@@ -194,7 +194,7 @@ export const generateOtp: RequestHandler = async (req, res, next) => {
 
 // VERIFY OTP
 export const verifyOtp: RequestHandler = async (req, res, next) => {
-    const { code } = req.body; // 🛑 changed from query to body 🛑
+    const { code } = req.body;
 
     if (!code) return next(createHttpError(501, 'invalid OTP'))
     if ((req.app.locals.OTP) === code) {

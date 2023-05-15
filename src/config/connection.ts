@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 
-export default function (connectionString:string) {
+export default async function (connectionString:string) {
     mongoose.set("strictQuery", true);
-    mongoose.connect(connectionString)
+    await mongoose.connect(connectionString)
         .then(() => {
             console.log("Database connected successfully")
         }).catch(console.error)
