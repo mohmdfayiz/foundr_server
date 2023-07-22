@@ -14,7 +14,7 @@ const user_1 = __importDefault(require("./routes/user"));
 const admin_1 = __importDefault(require("./routes/admin"));
 const errorHandler_1 = require("./middleware/errorHandler");
 const morgan_1 = __importDefault(require("morgan"));
-const socket_io_1 = require("socket.io");
+// import { Server } from "socket.io";
 const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
 app.use((0, cors_1.default)());
@@ -29,36 +29,36 @@ app.use('/api/user', user_1.default);
 app.use('/api/admin', admin_1.default);
 app.use(() => { throw (0, http_errors_1.default)(404, 'Route not found'); });
 app.use(errorHandler_1.errorHandler);
-const io = new socket_io_1.Server(server, {
-    cors: {
-        origin: validateEnv_1.default.FRONT_END_URL,
-        credentials: true,
-        allowedHeaders: [
-            'Content-Type',
-            'Access',
-            'Authorization'
-        ]
-    }
-});
-// save online users with user id and socket id
-const onlineUsers = new Map();
-io.on("connection", (socket) => {
-    // add user to onlineUsers
-    socket.on("addUser", (id) => {
-        onlineUsers.set(id, socket.id);
-    });
-    // send message to the client
-    socket.on("send-msg", (data) => {
-        const sendUserSocket = onlineUsers.get(data.to);
-        if (sendUserSocket) {
-            socket.to(sendUserSocket).emit("msg-receive", data.message);
-        }
-    });
-    // Handle disconnections
-    socket.on('disconnect', () => {
-        console.log('Client disconnected:', socket.id);
-    });
-});
+// const io = new Server(server, {
+//     cors: {
+//         origin: env.FRONT_END_URL,
+//         credentials: true,
+//         allowedHeaders: [
+//             'Content-Type',
+//             'Access',
+//             'Authorization'
+//         ]
+//     }
+// })
+// // save online users with user id and socket id
+// const onlineUsers = new Map();
+// io.on("connection", (socket) => {
+//     // add user to onlineUsers
+//     socket.on("addUser", (id) => {
+//         onlineUsers.set(id, socket.id)
+//     })
+//     // send message to the client
+//     socket.on("send-msg", (data) => {
+//         const sendUserSocket = onlineUsers.get(data.to)
+//         if (sendUserSocket) {
+//             socket.to(sendUserSocket).emit("msg-receive", data.message)
+//         }
+//     })
+//     // Handle disconnections
+//     socket.on('disconnect', () => {
+//         console.log('Client disconnected:', socket.id);
+//     });
+// })
 const port = validateEnv_1.default.PORT || 5000;
 (0, connection_1.default)(validateEnv_1.default.MONGO_CONNECTION_STRING).then(() => {
     server.listen(port, () => {
