@@ -9,7 +9,7 @@ import userRouter from "./routes/user"
 import adminRoute from "./routes/admin"
 import { errorHandler } from "./middleware/errorHandler";
 import morgan from "morgan"
-import { Server } from "socket.io";
+// import { Server } from "socket.io";
 
 const app = express();
 const server = http.createServer(app);
@@ -30,41 +30,41 @@ app.use('/api/admin', adminRoute);
 app.use(() => { throw createHttpError(404, 'Route not found') });
 app.use(errorHandler);
 
-const io = new Server(server, {
-    cors: {
-        origin: env.FRONT_END_URL,
-        credentials: true,
-        allowedHeaders: [
-            'Content-Type',
-            'Access',
-            'Authorization'
-        ]
-    }
-})
+// const io = new Server(server, {
+//     cors: {
+//         origin: env.FRONT_END_URL,
+//         credentials: true,
+//         allowedHeaders: [
+//             'Content-Type',
+//             'Access',
+//             'Authorization'
+//         ]
+//     }
+// })
 
-// save online users with user id and socket id
-const onlineUsers = new Map();
-io.on("connection", (socket) => {
+// // save online users with user id and socket id
+// const onlineUsers = new Map();
+// io.on("connection", (socket) => {
 
-    // add user to onlineUsers
-    socket.on("addUser", (id) => {
-        onlineUsers.set(id, socket.id)
-    })
+//     // add user to onlineUsers
+//     socket.on("addUser", (id) => {
+//         onlineUsers.set(id, socket.id)
+//     })
 
-    // send message to the client
-    socket.on("send-msg", (data) => {
-        const sendUserSocket = onlineUsers.get(data.to)
-        if (sendUserSocket) {
-            socket.to(sendUserSocket).emit("msg-receive", data.message)
-        }
-    })
+//     // send message to the client
+//     socket.on("send-msg", (data) => {
+//         const sendUserSocket = onlineUsers.get(data.to)
+//         if (sendUserSocket) {
+//             socket.to(sendUserSocket).emit("msg-receive", data.message)
+//         }
+//     })
 
-    // Handle disconnections
-    socket.on('disconnect', () => {
-        console.log('Client disconnected:', socket.id);
-    });
+//     // Handle disconnections
+//     socket.on('disconnect', () => {
+//         console.log('Client disconnected:', socket.id);
+//     });
 
-})
+// })
 
 const port = env.PORT || 5000
 database(env.MONGO_CONNECTION_STRING).then(() => {
