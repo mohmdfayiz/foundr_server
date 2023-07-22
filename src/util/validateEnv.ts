@@ -10,5 +10,4 @@ export default cleanEnv(process.env,{
     CLOUD_NAME:str(),
     API_KEY:str(),
     API_SECRET:str(),
-
 })

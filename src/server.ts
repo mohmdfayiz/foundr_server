@@ -21,12 +21,12 @@ app.use(express.urlencoded({ limit: "10mb", extended: true, parameterLimit: 1000
 app.use(morgan('dev'))
 
 // health check
-app.get('/', (req, res) => {res.status(200).json({message: 'OK'})})
+app.get('/', (req, res) => { res.status(200).json({ message: 'OK' }) })
 
 // api routes
 app.use('/api/user', userRouter);
 app.use('/api/admin', adminRoute);
-  
+
 app.use(() => { throw createHttpError(404, 'Route not found') });
 app.use(errorHandler);
 
@@ -34,7 +34,7 @@ const io = new Server(server, {
     cors: {
         origin: env.FRONT_END_URL,
         credentials: true,
-        allowedHeaders:[
+        allowedHeaders: [
             'Content-Type',
             'Access',
             'Authorization'
@@ -67,10 +67,10 @@ io.on("connection", (socket) => {
 })
 
 const port = env.PORT || 5000
-database(env.MONGO_CONNECTION_STRING);
-
-server.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+database(env.MONGO_CONNECTION_STRING).then(() => {
+    server.listen(port, () => {
+        console.log(`Server running on http://localhost:${port}`);
+    })
 })
 
 
